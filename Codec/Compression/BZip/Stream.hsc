@@ -228,14 +228,15 @@ instance Functor Stream where
     fmap = liftM
 
 instance Applicative Stream where
-    pure  = return
+    pure  = pureZ
     (<*>) = ap
+    (*>)  = thenZ_
 
 instance Monad Stream where
   (>>=)  = thenZ
 --  m >>= f = (m `thenZ` \a -> consistencyCheck `thenZ_` returnZ a) `thenZ` f
-  (>>)   = thenZ_
-  return = returnZ
+  (>>)   = (*>)
+  return = pure
 #if !MIN_VERSION_base(4,13,0)
   fail = Fail.fail
 #endif
@@ -243,10 +244,10 @@ instance Monad Stream where
 instance Fail.MonadFail Stream where
   fail   = (finalise >>) . failZ
 
-returnZ :: a -> Stream a
-returnZ a = BZ $ \_ inBuf outBuf outOffset outLength ->
+pureZ :: a -> Stream a
+pureZ a = BZ $ \_ inBuf outBuf outOffset outLength ->
                   return (inBuf, outBuf, outOffset, outLength, a)
-{-# INLINE returnZ #-}
+{-# INLINE pureZ #-}
 
 thenZ :: Stream a -> (a -> Stream b) -> Stream b
 thenZ (BZ m) f =
