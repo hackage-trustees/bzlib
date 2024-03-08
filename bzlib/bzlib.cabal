@@ -17,11 +17,14 @@ description:     This package provides a pure interface for compressing and
                  provides access to the full bzip2 feature set.
 build-type:      Simple
 cabal-version:   >= 1.10
-extra-source-files: cbits/bzlib_private.h cbits/LICENSE
-                    -- demo programs:
+extra-source-files: -- demo programs:
                     examples/bzip2.hs examples/bunzip2.hs
                     -- changelog
                     CHANGELOG.md
+
+flag system-bzlib
+    description:
+        Use system bzlib rather than the bundled sources
 
 source-repository head
   type: darcs
@@ -44,14 +47,9 @@ library
     build-depends: fail ==4.9.*
   includes:        bzlib.h
   ghc-options:     -Wall
-  if !os(windows)
-    -- Normally we use the the standard system bz2 lib:
-    extra-libraries: bz2
+
+  if flag(system-bzlib)
+      extra-libraries: bz2
   else
-    -- However for the benefit of users of Windows (which does not have zlib
-    -- by default) we bundle a complete copy of the C sources of bzip2-1.0.6
-    c-sources:     cbits/blocksort.c cbits/bzlib.c cbits/compress.c
-                   cbits/crctable.c cbits/decompress.c cbits/huffman.c
-                   cbits/randtable.c
-    include-dirs:  cbits
-    install-includes: bzlib.h
+      build-depends: bzlib-clib
+

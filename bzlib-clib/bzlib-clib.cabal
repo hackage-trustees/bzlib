@@ -1,0 +1,27 @@
+name:            bzlib-clib
+version:         1.0.8
+copyright:       (c) 2024 Julian Ospald
+license:         BSD3
+license-file:    LICENSE
+author:          Julian Ospald <hasufell@posteo.de>
+maintainer:      Julian Ospald <hasufell@posteo.de>
+category:        Codec
+synopsis:        Compression and decompression in the bzip2 format (C librare)
+description:     Bundled libarchive C sources for use with the bzlib Haskell bindings.
+build-type:      Simple
+cabal-version:   >= 1.10
+extra-source-files: cbits/bzlib_private.h cbits/LICENSE
+
+library
+  default-language: Haskell2010
+  includes:      bzlib.h
+  c-sources:     cbits/blocksort.c
+                 cbits/bzlib.c
+                 cbits/compress.c
+                 cbits/crctable.c
+                 cbits/decompress.c
+                 cbits/huffman.c
+                 cbits/randtable.c
+  include-dirs:  cbits
+  install-includes: bzlib.h
+

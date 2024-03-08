@@ -1,0 +1,2 @@
+packages: ./bzlib/
+          ./bzlib-clib/
