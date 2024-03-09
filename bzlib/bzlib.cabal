@@ -1,5 +1,6 @@
+cabal-version:   2.0
 name:            bzlib
-version:         0.5.1.0
+version:         0.5.2.0
 copyright:       (c) 2006-2015 Duncan Coutts
 license:         BSD3
 license-file:    LICENSE
@@ -16,12 +17,14 @@ description:     This package provides a pure interface for compressing and
                  tasks and for the few cases where more control is needed it
                  provides access to the full bzip2 feature set.
 build-type:      Simple
-cabal-version:   >= 1.10
-extra-source-files: cbits/bzlib_private.h cbits/LICENSE
-                    -- demo programs:
-                    examples/bzip2.hs examples/bunzip2.hs
-                    -- changelog
-                    CHANGELOG.md
+extra-doc-files: CHANGELOG.md
+extra-source-files:
+  -- demo programs:
+  examples/bzip2.hs examples/bunzip2.hs
+
+flag system-bzlib
+    description:
+        Use system bzlib rather than the bundled sources
 
 source-repository head
   type: darcs
@@ -38,20 +41,17 @@ library
                    Codec.Compression.BZip.Internal
   other-modules:   Codec.Compression.BZip.Stream
   default-extensions: CPP, ForeignFunctionInterface
-  build-depends:   base >= 4.3 && < 4.16,
-                   bytestring == 0.9.* || == 0.10.*
+  build-depends:   base >= 4.3 && < 4.20,
+                   bytestring >= 0.9 && < 0.13
+
   if !impl(ghc >=8.0)
     build-depends: fail ==4.9.*
+
   includes:        bzlib.h
   ghc-options:     -Wall
-  if !os(windows)
-    -- Normally we use the the standard system bz2 lib:
-    extra-libraries: bz2
+
+  if flag(system-bzlib)
+      extra-libraries: bz2
   else
-    -- However for the benefit of users of Windows (which does not have zlib
-    -- by default) we bundle a complete copy of the C sources of bzip2-1.0.6
-    c-sources:     cbits/blocksort.c cbits/bzlib.c cbits/compress.c
-                   cbits/crctable.c cbits/decompress.c cbits/huffman.c
-                   cbits/randtable.c
-    include-dirs:  cbits
-    install-includes: bzlib.h
+      build-depends: bzip2-clib
+
