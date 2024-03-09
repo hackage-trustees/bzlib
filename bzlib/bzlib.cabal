@@ -53,5 +53,5 @@ library
   if flag(system-bzlib)
       extra-libraries: bz2
   else
-      build-depends: bzlib-clib
+      build-depends: bzip2-clib
 
